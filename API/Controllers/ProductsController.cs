@@ -23,7 +23,6 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-            var test = "";
             return product;
         }
     }
