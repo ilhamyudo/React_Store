@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Product } from '../models/product';
 import Catalog from '../../features/catalog/Catalog';
-import { Container, Typography, Button, Box } from '@mui/material';
+import { Box, Container, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import NavBar from './NavBar';
 
 function App() {
 
   const [products, setProducts] = useState<Product[]>([]);
+
+  const [darkMode, setDarkMode] = useState(false);
+
+  function toggleDarkMode() {
+      setDarkMode(!darkMode);
+  }   
 
   useEffect(() => {
     fetch('https://localhost:5010/api/products')
@@ -13,36 +20,47 @@ function App() {
       .then(data => setProducts(data))
   }, [])
 
-  const addProduct = () => {
-    setProducts(prevState => [...prevState, 
-      {
-        id: prevState.length+1, 
-        name: 'Product '+(prevState.length+1), 
-        price: (prevState.length * 100) + 100,
-        description: 'Description',
-        pictureUrl: 'https://via.placeholder.com/150',
-        brand: 'Brand',
-        type: 'Type',
-        quantityInStock: 10
-      }])
-  };
+  // const addProduct = () => {
+  //   setProducts(prevState => [...prevState, 
+  //     {
+  //       id: prevState.length+1, 
+  //       name: 'Product '+(prevState.length+1), 
+  //       price: (prevState.length * 100) + 100,
+  //       description: 'Description',
+  //       pictureUrl: 'https://via.placeholder.com/150',
+  //       brand: 'Brand',
+  //       type: 'Type',
+  //       quantityInStock: 10
+  //     }])
+  // };
+
+  const palleteType = darkMode ? 'dark' : 'light';
+
+  const theme = createTheme({
+    palette:{
+      mode: palleteType,
+      background:{
+        default: palleteType === 'light' ? '#eaeaea' : '#121212'
+      }
+    }
+  })
 
   return (
-    <Container maxWidth="xl">
+    <ThemeProvider theme={theme}>
+      <CssBaseline></CssBaseline>
+      <NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode}/>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: 2
+          minHeight: '100vh',
+          background: darkMode ? 'radial-gradient(circle,#1e3aBa, #11B27)' : 'radial-gradient(circle,#baecf9, #f0f9ff)',
+          py: 6
         }}
       >
-        <Typography variant='h4'>React Store</Typography>
-        <Button variant='contained' onClick={addProduct}>Add Product</Button>
+        <Container maxWidth="xl" sx={{marginTop: 8, marginBottom: 8}}>
+          <Catalog products={products}/>
+        </Container>
       </Box>
-      
-      <Catalog products={products}/>
-    </Container>
+    </ThemeProvider>
   )
 }
 
